@@ -29,6 +29,19 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
+// Tooltip component
+const Tooltip = ({ children, content }) => {
+  return (
+    <div className="relative group">
+      {children}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap shadow-lg border border-red-500 z-10">
+        {content}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-t-4 border-r-4 border-l-4 border-t-gray-900 border-r-transparent border-l-transparent"></div>
+      </div>
+    </div>
+  );
+};
+
 const GameCard = ({ game, isHovered, onHover }) => {
   const [feedback, setFeedback] = useState({ show: false, message: '', type: 'success' });
   const [isAdding, setIsAdding] = useState({ completed: false, inProgress: false, planned: false });
@@ -116,39 +129,47 @@ const GameCard = ({ game, isHovered, onHover }) => {
               animate={{ opacity: 1 }}
               className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4 gap-2"
             >
-              <button 
-                className={`p-3 border-2 border-red-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.completed && addToCollection('completed')}
-                disabled={isAdding.completed}
-              >
-                {isAdding.completed ? (
-                  <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
-                ) : (
-                  <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
-                )}
-              </button>
-              <button 
-                className={`p-3 border-2 border-red-500 bg-gray-500/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
-                disabled={isAdding.inProgress}
-              >
-                {isAdding.inProgress ? (
-                  <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
-                ) : (
-                  <ClipboardCopy className="w-5 h-5 text-rose-500" />
-                )}
-              </button>
-              <button 
-                className={`p-3 border-2 border-red-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.planned && addToCollection('planned')}
-                disabled={isAdding.planned}
-              >
-                {isAdding.planned ? (
-                  <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
-                ) : (
-                  <ClipboardList className="w-5 h-5 text-blue-500" />
-                )}
-              </button>
+              <Tooltip content="Add to Played">
+                <button 
+                  className={`p-3 border-2 border-red-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.completed && addToCollection('completed')}
+                  disabled={isAdding.completed}
+                >
+                  {isAdding.completed ? (
+                    <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
+                  ) : (
+                    <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
+                  )}
+                </button>
+              </Tooltip>
+              
+              <Tooltip content="Add to Currently Playing">
+                <button 
+                  className={`p-3 border-2 border-red-500 bg-gray-500/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
+                  disabled={isAdding.inProgress}
+                >
+                  {isAdding.inProgress ? (
+                    <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
+                  ) : (
+                    <ClipboardCopy className="w-5 h-5 text-rose-500" />
+                  )}
+                </button>
+              </Tooltip>
+              
+              <Tooltip content="Add to Play Later">
+                <button 
+                  className={`p-3 border-2 border-red-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.planned && addToCollection('planned')}
+                  disabled={isAdding.planned}
+                >
+                  {isAdding.planned ? (
+                    <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
+                  ) : (
+                    <ClipboardList className="w-5 h-5 text-blue-500" />
+                  )}
+                </button>
+              </Tooltip>
             </motion.div>
           )}
           {game.rating && (

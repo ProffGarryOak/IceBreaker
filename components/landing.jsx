@@ -193,7 +193,7 @@ export default function Landing() {
       icon: <Eye className="h-8 w-8" />,
       title: "Anime",
       route: "/anime",
-      bgColor: "bg-gradient-to-r from-green-400 to-green-700 border-0",
+      bgColor: "bg-gradient-to-r from-emerald-300 to-emerald-700 border-0",
     },
     {
       icon: <Tv2 className="h-8 w-8" />,
@@ -295,7 +295,7 @@ export default function Landing() {
       icon: <MessageSquare className="h-6 w-6" />,
       value: "4.3M",
       label: "Reviews",
-      color: "from-green-500 to-green-700",
+      color: "from-emerald-500 to-emerald-700",
     },
     {
       icon: <ThumbsUp className="h-6 w-6" />,
@@ -595,7 +595,7 @@ export default function Landing() {
       </section>
 
       {/* 🎮 Interactive Ice Cards Preview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto" id="card">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold">Your Personality, As a Card</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">

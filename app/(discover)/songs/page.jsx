@@ -29,6 +29,37 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
+// Tooltip component
+const Tooltip = ({ content, children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+      onFocus={() => setIsVisible(true)}
+      onBlur={() => setIsVisible(false)}
+    >
+      {children}
+      
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-900 text-white text-xs rounded-md shadow-lg whitespace-nowrap z-50"
+          >
+            {content}
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const SongCard = ({ song, isHovered, onHover }) => {
   const [feedback, setFeedback] = useState({ show: false, message: '', type: 'success' });
   const [isAdding, setIsAdding] = useState({ completed: false, inProgress: false, planned: false });
@@ -116,39 +147,50 @@ const SongCard = ({ song, isHovered, onHover }) => {
               animate={{ opacity: 1 }}
               className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4 gap-2"
             >
-              <button 
-                className={`p-3 border-2 border-purple-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.completed && addToCollection('completed')}
-                disabled={isAdding.completed}
-              >
-                {isAdding.completed ? (
-                  <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
-                ) : (
-                  <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
-                )}
-              </button>
-              <button 
-                className={`p-3 border-2 border-purple-500 bg-gray-100/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
-                disabled={isAdding.inProgress}
-              >
-                {isAdding.inProgress ? (
-                  <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
-                ) : (
-                  <ClipboardCopy className="w-5 h-5 text-rose-500" />
-                )}
-              </button>
-              <button 
-                className={`p-3 border-2 border-purple-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
-                onClick={() => !isAdding.planned && addToCollection('planned')}
-                disabled={isAdding.planned}
-              >
-                {isAdding.planned ? (
-                  <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
-                ) : (
-                  <ClipboardList className="w-5 h-5 text-blue-500" />
-                )}
-              </button>
+              <Tooltip content="Add to Listened">
+                <button 
+                  className={`p-3 border-2 border-purple-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.completed && addToCollection('completed')}
+                  disabled={isAdding.completed}
+                  aria-label="Add to Listened"
+                >
+                  {isAdding.completed ? (
+                    <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
+                  ) : (
+                    <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
+                  )}
+                </button>
+              </Tooltip>
+              
+              <Tooltip content="Add to Currently Playing">
+                <button 
+                  className={`p-3 border-2 border-purple-500 bg-gray-100/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
+                  disabled={isAdding.inProgress}
+                  aria-label="Add to Currently Playing"
+                >
+                  {isAdding.inProgress ? (
+                    <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
+                  ) : (
+                    <ClipboardCopy className="w-5 h-5 text-rose-500" />
+                  )}
+                </button>
+              </Tooltip>
+              
+              <Tooltip content="Add to Listen Later">
+                <button 
+                  className={`p-3 border-2 border-purple-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
+                  onClick={() => !isAdding.planned && addToCollection('planned')}
+                  disabled={isAdding.planned}
+                  aria-label="Add to Listen Later"
+                >
+                  {isAdding.planned ? (
+                    <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
+                  ) : (
+                    <ClipboardList className="w-5 h-5 text-blue-500" />
+                  )}
+                </button>
+              </Tooltip>
             </motion.div>
           )}
           {song.trackRating && (

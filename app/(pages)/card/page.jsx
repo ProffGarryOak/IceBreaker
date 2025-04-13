@@ -36,11 +36,11 @@ const CATEGORY_STYLES = {
     cta: 'Find your next binge-worthy series'
   },
   anime: {
-    bg: 'bg-gradient-to-br from-green-400/10 to-green-700/20',
-    border: 'border-green-400',
-    icon: <Sword className="h-5 w-5 text-green-400" />,
-    iconSolid: <Wand2 className="h-5 w-5 text-green-400 fill-green-400/20" />,
-    accent: 'text-green-400',
+    bg: 'bg-gradient-to-br from-emerald-400/10 to-emerald-700/20',
+    border: 'border-emerald-400',
+    icon: <Sword className="h-5 w-5 text-emerald-400" />,
+    iconSolid: <Wand2 className="h-5 w-5 text-emerald-400 fill-emerald-400/20" />,
+    accent: 'text-emerald-400',
     name: 'Anime',
     tagline: 'Otaku Supreme',
     cta: 'Connect with fellow anime enthusiasts'
@@ -78,7 +78,7 @@ const CATEGORY_STYLES = {
 }
 
 const STATUS_ICONS = {
-  completed: <Check className="h-4 w-4 text-green-400" />,
+  completed: <Check className="h-4 w-4 text-emerald-400" />,
   inProgress: <Play className="h-4 w-4 text-yellow-400" />,
   planned: <Plus className="h-4 w-4 text-blue-400" />
 }
@@ -375,7 +375,7 @@ export default function IceCardMaker() {
                   <>
                     <Button 
                       onClick={() => setEditMode(false)}
-                      className="gap-2 bg-green-600 hover:bg-green-700 flex-1"
+                      className="gap-2 bg-emerald-600 hover:bg-emerald-700 flex-1"
                     >
                       <Save className="h-4 w-4" />
                       Save
