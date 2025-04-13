@@ -467,8 +467,8 @@ export default function Landing() {
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-purple-500/30 transition-all group"
             >
-              <Link href="#explore" className="flex items-center gap-2">
-                <span>Explore Trends</span>
+              <Link href="/about" className="flex items-center gap-2">
+                <span>Know More</span>
                 <TrendingUp className="h-4 w-4" />
               </Link>
             </Button>

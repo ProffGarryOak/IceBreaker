@@ -55,7 +55,7 @@ const CATEGORY_STYLES = {
     tagline: 'Page Turner',
     cta: 'Share your literary adventures'
   },
-  music: {
+  songs: {
     bg: 'bg-gradient-to-br from-purple-400/10 to-purple-600/20',
     border: 'border-purple-400',
     icon: <Music className="h-5 w-5 text-purple-400" />,
@@ -324,7 +324,7 @@ export default function IceCardMaker() {
                 <h4 className="font-medium text-xl mb-2">{CATEGORY_STYLES[selectedTheme].cta}</h4>
                 <div className="flex items-center justify-center gap-2 text-lg">
                   <Snowflake className="h-3 w-3" />
-                  <span>Icebreaker.vercel.app</span>
+                  <span>icebreaker-nine.vercel.app</span>
                   <Sparkles className="h-3 w-3" />
                 </div>
               </div>
