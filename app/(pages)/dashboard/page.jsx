@@ -323,8 +323,8 @@ export default function DashboardPage() {
             const totalItems = calculateTotalItems(content);
             if (totalItems >= 500) return "god";
             if (totalItems >= 200) return "pro";
-            if (totalItems >= 50) return "binge";
-            if (totalItems >= 10) return "casual";
+            if (totalItems >= 75) return "binge";
+            if (totalItems >= 30) return "casual";
             return "noob";
           })()}
         />
