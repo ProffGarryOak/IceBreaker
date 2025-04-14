@@ -1,5 +1,5 @@
 'use client'
-
+import {useRouter} from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -167,7 +167,7 @@ export default function IceCardMaker() {
   }
 
   const stats = calculateStats()
-  const profileUrl = `${window.location.origin}/profile/${user?.id || 'user'}`
+  const profileUrl = `https://icebreaker-nine.vercel.app/profile/${user?.id || 'user'}`
   const topCategoryData = stats.topCategory ? CATEGORY_STYLES[stats.topCategory] : null
 
   const downloadCard = () => {
@@ -202,7 +202,7 @@ export default function IceCardMaker() {
   if (!contentData) return (
     <div className="text-center mt-12">
       <p className="text-gray-400">Couldn't load your content data</p>
-      <Button onClick={() => window.location.reload()} className="mt-4">
+      <Button onClick={() => router.refresh()} className="mt-4">
         Try Again
       </Button>
     </div>
@@ -334,7 +334,7 @@ export default function IceCardMaker() {
         
         {/* Customization Panel */}
         <div className="lg:w-80 space-y-6">
-          <div className="bg-gray-900/50 border border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-900/50 border-0 border-gray-700 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-white mb-4">
               Customize Your Card
             </h2>
@@ -412,25 +412,7 @@ export default function IceCardMaker() {
           </div>
           
           {/* Stats Summary */}
-          <div className="bg-gray-900/50 border border-gray-700 rounded-xl p-6 text-gray-200">
-            <h3 className="font-medium text-blue-300 mb-3">Your Totals</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Total Items</span>
-                <span className="font-bold text-purple-300">{stats.total}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Estimated Hours</span>
-                <span className="font-bold text-purple-300">{Math.floor(stats.total * 3.7)} hrs</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Categories</span>
-                <span className="font-bold text-purple-300">
-                  {Object.keys(stats.byCategory).filter(c => stats.byCategory[c].total > 0).length}
-                </span>
-              </div>
-            </div>
-          </div>
+         
         </div>
       </div>
     </div>

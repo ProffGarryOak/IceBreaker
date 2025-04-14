@@ -22,6 +22,8 @@ import {
   User as UserIcon,
   Snowflake,
   PersonStanding,
+  Clock,
+  Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -212,6 +214,13 @@ export default function DashboardPage() {
     return stats;
   };
 
+  // Added function to calculate estimated time
+  const calculateTotalTime = (content) => {
+    if (!content || typeof content !== "object") return 0;
+    const totalItems = calculateTotalItems(content);
+    return (totalItems * 3.7).toFixed(1); // Average time per item (3.7 hours)
+  };
+
   const categoryStats = calculateCategoryStats();
   const activeCategoryData = contentCategories.find(
     (c) => c.id === activeCategory
@@ -240,12 +249,11 @@ export default function DashboardPage() {
             </Button>
           </Link>
           <Link href={`/profile/${user?.id}`}>
-
             <Button
               variant="outline"
-              className="gap-2 bg-rose-600/10 hover:bg-rose-600/20 hover:text-rose-500/50 border-rose-400 text-rose-400"
+              className="gap-2 bg-purple-600/10 hover:bg-purple-600/20 hover:text-purple-500/50 border-purple-400 text-purple-400"
             >
-              <PersonStanding className="h-5 w-5"/>
+              <PersonStanding className="h-5 w-5" />
               View Your Public Profile
             </Button>
           </Link>
@@ -262,156 +270,175 @@ export default function DashboardPage() {
         />
 
         <DashboardStat
-          title="Active Category"
-          value={activeCategoryData?.name || "--"}
-          icon={activeCategoryData?.icon || <List className="h-5 w-5" />}
+          title="Estimated Time"
+          value={calculateTotalTime(content) + " hrs"}
+          icon={<Clock className="h-5 w-5" />}
           loading={loading}
         />
 
         <DashboardStat
-          title="Current Status"
-          value={activeStatusData?.name || "--"}
-          icon={activeStatusData?.icon || <List className="h-5 w-5" />}
-          loading={loading}
-        />
-
-        <DashboardStat
-          title="Status"
-          value={error ? "Error" : content ? "Success" : "--"}
-          icon={
-            error ? (
-              <AlertCircle className="h-5 w-5" />
-            ) : (
-              <CheckCircle className="h-5 w-5" />
-            )
+          title="Top Category"
+          value={
+            content
+              ? Object.entries(categoryStats).reduce(
+                  (top, [category, stats]) => 
+                    stats.total > (top?.stats?.total || 0) 
+                      ? { category, stats } 
+                      : top,
+                  { category: "", stats: { total: 0 } }
+                ).category || "--"
+              : "--"
           }
+          icon={<Trophy className="h-5 w-5" />}
           loading={loading}
-          status={error ? "error" : "success"}
+        />
+
+        <DashboardStat
+          title="Your Tier"
+          value={(() => {
+            if (error) return "Error";
+            if (!content) return "--";
+            
+            const totalItems = calculateTotalItems(content);
+            if (totalItems >= 500) return " God Mode";
+            if (totalItems >= 200) return "Pro Watcher";
+            if (totalItems >= 75) return "Binge Boss";
+            if (totalItems >= 30) return "Casual Viewer";
+            return "Noob List";
+          })()}
+          icon={(() => {
+            if (error) return <AlertCircle className="h-5 w-5" />;
+            
+            const totalItems = calculateTotalItems(content);
+            if (totalItems >= 500) return <Snowflake className="h-5 w-5" />;
+            if (totalItems >= 200) return <Film className="h-5 w-5" />;
+            if (totalItems >= 75) return <Tv2 className="h-5 w-5" />;
+            if (totalItems >=30) return <Eye className="h-5 w-5" />;
+            return <UserIcon className="h-5 w-5" />;
+          })()}
+          loading={loading}
+          status={(() => {
+            if (error) return "error";
+            
+            const totalItems = calculateTotalItems(content);
+            if (totalItems >= 500) return "god";
+            if (totalItems >= 200) return "pro";
+            if (totalItems >= 50) return "binge";
+            if (totalItems >= 10) return "casual";
+            return "noob";
+          })()}
         />
       </div>
 
       <div className="mb-6">
-  {/* Category Tabs - Horizontal Scrollable */}
-  <div className="w-full pb-2" >
-    <Tabs defaultValue="movies">
-    <TabsList className="flex w-max bg-transparent  gap-2 p-1">
-        {contentCategories.map((category) => {
-          const isActive = activeCategory === category.id;
-          const activeColorClass = category.color.split(' ')[0]; // Get the bg-color class
-          const textColorClass = category.color.split(' ')[2]; // Get the text-color class
-          
-          return (
-            <motion.div
-              key={category.id}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <TabsTrigger
-                value={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`relative flex items-center gap-2 px-10 py-2 rounded-xl transition-all ${
-                  isActive 
-                    ? `${activeColorClass} border-2 ${textColorClass.replace('text-', 'border-')} shadow-lg`
-                    : "bg-gray-800/50 hover:bg-gray-700/50"
-                }`}
-              >
-                {/* Animated underline for active tab */}
-                {isActive && (
-                  <motion.div 
-                    className={`absolute bottom-0 left-0 right-0 h-1 ${activeColorClass}`}
-                    layoutId="activeCategoryUnderline"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                
-                <div className={`p-2 rounded-md ${
-                  isActive ? "bg-black/30" : "bg-black/20"
-                }`}>
-                  {React.cloneElement(category.icon, {
-                    className: `h-5 w-5 ${isActive ? textColorClass : 'text-gray-400'}`
-                  })}
-                </div>
-                <span className={`font-medium ${
-                  isActive ? textColorClass : 'text-gray-300'
-                }`}>
-                  {category.name}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className={`ml-1 ${
-                    isActive 
-                      ? 'bg-black/20 text-white' 
-                      : 'bg-gray-700/50 text-gray-300'
-                  }`}
-                >
-                  {categoryStats[category.id]?.total || 0}
-                </Badge>
-              </TabsTrigger>
-            </motion.div>
-          );
-        })}
-      </TabsList>
-    </Tabs>
-  </div>
+        {/* Category Tabs - Horizontal Scrollable */}
+        <div className="w-full pb-2">
+          <Tabs defaultValue="movies">
+            <TabsList className="flex w-max bg-transparent gap-2 p-1">
+              {contentCategories.map((category) => {
+                const isActive = activeCategory === category.id;
+                const activeColorClass = category.color.split(" ")[0]; // Get the bg-color class
+                const textColorClass = category.color.split(" ")[2]; // Get the text-color class
 
-  {/* Status Filters - Full Width Grid */}
-  <div className="grid grid-cols-3 gap-2 mt-4">
-    {statusOptions.map((status) => {
-      const isActive = activeStatus === status.id;
-      const activeColorClass = status.color.split(' ')[0]; // Get the bg-color class
-      const textColorClass = status.color.split(' ')[2]; // Get the text-color class
-      
-      return (
-        <motion.button
-          key={status.id}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setActiveStatus(status.id)}
-          className={`relative flex items-center justify-between p-3 rounded-xl transition-all overflow-hidden ${
-            isActive
-              ? `${activeColorClass} border-2 ${textColorClass.replace('text-', 'border-')} shadow-lg`
-              : "bg-gray-800/50 hover:bg-gray-700/50"
-          }`}
-        >
-          {/* Animated background pulse for active status */}
+                return (
+                  <motion.div
+                    key={category.id}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <TabsTrigger
+                      value={category.id}
+                      onClick={() => setActiveCategory(category.id)}
+                      className={`relative flex items-center gap-2 px-10 py-2 rounded-xl transition-all ${
+                        isActive
+                          ? `${activeColorClass} border-2 ${textColorClass.replace(
+                              "text-",
+                              "border-"
+                            )} shadow-lg`
+                          : "bg-gray-800/50 hover:bg-gray-700/50"
+                      }`}
+                    >
+                      {/* Animated underline for active tab */}
+                      {isActive && (
+                        <motion.div
+                          className={`absolute bottom-0 left-0 right-0 h-1 ${activeColorClass}`}
+                          layoutId="activeCategoryUnderline"
+                          transition={{
+                            type: "spring",
+                            bounce: 0.2,
+                            duration: 0.6,
+                          }}
+                        />
+                      )}
+
+                      <div
+                        className={`p-2 rounded-md ${
+                          isActive ? "bg-black/30" : "bg-black/20"
+                        }`}
+                      >
+                        {React.cloneElement(category.icon, {
+                          className: `h-5 w-5 ${
+                            isActive ? textColorClass : "text-gray-400"
+                          }`,
+                        })}
+                      </div>
+                      <span
+                        className={`font-medium ${
+                          isActive ? textColorClass : "text-gray-300"
+                        }`}
+                      >
+                        {category.name}
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className={`ml-1 ${
+                          isActive
+                            ? "bg-black/20 text-white"
+                            : "bg-gray-700/50 text-gray-300"
+                        }`}
+                      >
+                        {categoryStats[category.id]?.total || 0}
+                      </Badge>
+                    </TabsTrigger>
+                  </motion.div>
+                );
+              })}
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Status Filters - Full Width Grid */}
+        <div className="flex gap-4 mt-10">
+  {statusOptions.map((status) => {
+    const isActive = activeStatus === status.id;
+    const textColorClass = status.color.split(" ")[2]; // Get the text-color class
+
+    return (
+      <motion.button
+        key={status.id}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setActiveStatus(status.id)}
+        className={`relative pb-1 text-sm font-medium transition-colors ${
+          isActive ? textColorClass : "text-gray-400"
+        }`}
+      >
+        {status.name}
+        <span className="absolute bottom-0 left-0 right-0 h-0.5">
           {isActive && (
-            <motion.div 
-              className={`absolute inset-0 ${activeColorClass} opacity-20`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.2 }}
-              transition={{ duration: 0.3 }}
+            <motion.span
+              className={`absolute bottom-0 left-0 right-0 h-0.5 ${textColorClass} bg-current`}
+              layoutId="statusUnderline"
+              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
             />
           )}
-          
-          <div className="flex items-center gap-3 z-10">
-            <div className={`p-2 rounded-lg ${
-              isActive ? "bg-black/30" : "bg-black/20"
-            }`}>
-              {React.cloneElement(status.icon, {
-                className: `h-5 w-5 ${isActive ? textColorClass : 'text-gray-400'}`
-              })}
-            </div>
-            <span className={`font-medium ${
-              isActive ? textColorClass : 'text-gray-300'
-            }`}>
-              {status.name}
-            </span>
-          </div>
-          <Badge
-            variant="secondary"
-            className={`z-10 ${
-              isActive
-                ? 'bg-black/20 text-white'
-                : 'bg-gray-700/50 text-gray-300'
-            }`}
-          >
-            {categoryStats[activeCategory]?.[status.id] || 0}
-          </Badge>
-        </motion.button>
-      );
-    })}
-  </div>
+        </span>
+        
+      </motion.button>
+    );
+  })}
 </div>
+      </div>
 
       {/* Content Section */}
       <Card className="bg-gray-800 border-gray-700">
@@ -574,17 +601,32 @@ export default function DashboardPage() {
   );
 }
 
-function DashboardStat({ title, value, icon, loading, status = "normal" }) {
+function DashboardStat({ title, value, icon, loading, status="normal" }) {
   const statusColors = {
-    normal: "bg-gray-800 border-gray-700",
+    normal: "bg-purple-600/5 border-gray-700/50",
     success: "bg-green-900/50 border-green-800",
     error: "bg-red-900/50 border-red-800",
+    god: "bg-gradient-to-r from-rose-900 via-rose-400 to-rose-800 border-rose-700",   // diamond
+    pro: "bg-gradient-to-r from-yellow-900 via-yellow-600 to-yellow-500 border-yellow-600", // gold
+    binge: "bg-gradient-to-r from-slate-800 to-slate-500 border-slate-400",     // silver
+    casual: "bg-gradient-to-r from-amber-950 to-amber-600 border-amber-700",  // bronze
+    noob: "bg-yellow-950/50 border-yellow-800" // wood (plain, rugged look)
   };
+  
+  const textColors = {
+    normal: "text-white",
+    success: "text-green-400",
+    error: "text-red-400",
+    god: "text-amber-200",     // diamond
+    pro: "text-yellow-300",     // gold
+    binge: "text-slate-300",    // silver
+    casual: "text-amber-400",   // bronze
+    noob: "text-yellow-900"     // wood
+  };
+  
 
   return (
-    <Card
-      className={`${statusColors[status]} transition-all hover:scale-[1.02]`}
-    >
+    <Card className={`${statusColors[status]} transition-all hover:scale-[1.02]`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium text-gray-400">
@@ -597,15 +639,7 @@ function DashboardStat({ title, value, icon, loading, status = "normal" }) {
         {loading ? (
           <Skeleton className="h-8 w-3/4 bg-gray-700" />
         ) : (
-          <h3
-            className={`text-2xl font-bold ${
-              status === "error"
-                ? "text-red-400"
-                : status === "success"
-                ? "text-green-400"
-                : "text-white"
-            }`}
-          >
+          <h3 className={`text-2xl font-bold ${textColors[status]}`}>
             {value}
           </h3>
         )}

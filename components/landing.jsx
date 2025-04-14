@@ -10,6 +10,7 @@ import {
   Headphones,
   Music,
   Snowflake,
+  ChevronRight,
   Star,
   Tv2,
   Users,
@@ -387,96 +388,220 @@ export default function Landing() {
       </div>
 
       {/* 🚀 Hero Section */}
-      <section className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
-        <div className="text-center space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 rounded-full shadow-lg"
-          >
-            <Rocket className="h-4 w-4" />
-            <span className="text-sm font-medium">Under Development</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight"
-          >
-            Your Content Universe <br />
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={currentTagline}
+      <SignedOut>
+        <section className="relative py-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            {/* Left side - Content */}
+            <div className="md:w-1/2 space-y-8">
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="block text-2xl md:text-4xl font-normal bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300 mt-4"
+                transition={{ delay: 0.1 }}
+                className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight"
               >
-                {taglines[currentTagline]}
-              </motion.span>
-            </AnimatePresence>
-          </motion.h1>
+                Unlock Your Content Universe <br />
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={currentTagline}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="block text-2xl md:text-4xl font-normal bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300 mt-4"
+                  >
+                    {taglines[currentTagline]}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-gray-300 max-w-3xl mx-auto"
-          >
-            Track, share, and obsess over movies, anime, books, and more—with
-            friends who{" "}
-            <span className="text-purple-300 font-medium">actually</span> get
-            it.
-          </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-xl text-gray-300 max-w-3xl"
+              >
+                Track, share, and obsess over movies, anime, books, and
+                more—with friends who{" "}
+                <span className="text-purple-300 font-medium">actually</span>{" "}
+                get it.
+              </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-wrap gap-4 justify-center"
-          >
-            <SignedOut>
-              <SignUpButton>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-wrap gap-4"
+              >
+                <SignedOut>
+                  <SignUpButton>
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-purple-500/30 transition-all group text-lg"
+                    >
+                      <span className="transition-transform">Get Started</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
+
+                <SignedIn>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-6000 shadow-lg hover:shadow-purple-500/30 transition-all group text-lg"
+                  >
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      <span className="transition-transform">
+                        Go to Dashboard
+                      </span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </SignedIn>
+
                 <Button
+                  asChild
                   size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-purple-500/30 transition-all group"
+                  className="bg-gray-600/30 hover:bg-gray-700/20 transition-all group text-lg"
                 >
-                  <span className="transition-transform">Get Started</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <Link href="/about" className="flex items-center gap-2">
+                    <span>Know More</span>
+                    <TrendingUp className="h-4 w-4" />
+                  </Link>
                 </Button>
-              </SignUpButton>
-            </SignedOut>
+              </motion.div>
+            </div>
 
-            <SignedIn>
-              <Button
-                asChild
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-6000 shadow-lg hover:shadow-purple-500/30 transition-all group"
+            {/* Right side - Logo */}
+            <div className="md:w-1/2 pt-20 flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="max-w-md w-full"
               >
-                <Link href="/dashboard" className="flex items-center gap-2">
-                  <span className="transition-transform">Go to Dashboard</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-            </SignedIn>
+                <div className="relative w-[600px] h-[600px]">
+                  {" "}
+                  {/* adjust as needed */}
+                  <Image
+                    src="/logo.png"
+                    alt="Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </SignedOut>
+      <SignedIn>
+        <section className="relative py-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            {/* Left side - Content */}
+            <div className="md:w-1/2 space-y-8">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight"
+              >
+                Welcome Your Content Universe <br />
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={currentTagline}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="block text-2xl md:text-4xl font-normal bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300 mt-4"
+                  >
+                    {taglines[currentTagline]}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.h1>
 
-            <Button
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-purple-500/30 transition-all group"
-            >
-              <Link href="/about" className="flex items-center gap-2">
-                <span>Know More</span>
-                <TrendingUp className="h-4 w-4" />
-              </Link>
-            </Button>
-          </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-xl text-gray-300 max-w-3xl"
+              >
+                Track, share, and obsess over movies, anime, books, and
+                more—with friends who{" "}
+                <span className="text-purple-300 font-medium">actually</span>{" "}
+                get it.
+              </motion.p>
 
-          {/* Animated search bar preview */}
-        </div>
-      </section>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-wrap gap-4"
+              >
+                <SignedOut>
+                  <SignUpButton>
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-purple-500/30 transition-all group text-lg p-2"
+                    >
+                      <span className="transition-transform">Get Started</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
+
+                <SignedIn>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-6000 shadow-lg hover:shadow-purple-500/30 transition-all group p-2 text-lg"
+                  >
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      <span className="transition-transform">
+                        Go to Dashboard
+                      </span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </SignedIn>
+
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-gray-600/30 hover:bg-gray-700/20 transition-all group text-lg"
+                >
+                  <Link href="/about" className="flex items-center gap-2">
+                    <span>Know More</span>
+                    <TrendingUp className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* Right side - Logo */}
+            <div className="md:w-1/2 flex pt-20 justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="max-w-md w-full"
+              >
+                <div className="relative w-[600px] h-[600px]">
+                  {" "}
+                  {/* adjust as needed */}
+                  <Image
+                    src="/logo.png"
+                    alt="Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </SignedIn>
 
       {/* 🌟 Featured Stats */}
       <section className="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
@@ -496,7 +621,7 @@ export default function Landing() {
       {/* 🌌 Content Galaxy (All Routes Grid) */}
       <section
         className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto z-10"
-        id="explore"
+        id="content"
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -525,7 +650,10 @@ export default function Landing() {
       </section>
 
       {/* 🔥 Trending Now Section */}
-      <section className="py-16 bg-gradient-to-r from-purple-900/50 to-blue-900/50 backdrop-blur-sm">
+      <section
+        className="py-16 bg-gradient-to-r from-purple-900/50 to-blue-900/50 backdrop-blur-sm"
+        id="explore"
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
             <div>
@@ -595,7 +723,10 @@ export default function Landing() {
       </section>
 
       {/* 🎮 Interactive Ice Cards Preview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto" id="card">
+      <section
+        className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
+        id="card"
+      >
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold">Your Personality, As a Card</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -613,7 +744,7 @@ export default function Landing() {
             <Image
               src="/card.png"
               alt="Demon Image"
-              width={700} 
+              width={700}
               height={700}
               className="rounded-lg"
             />
