@@ -12,7 +12,7 @@ export async function POST(req) {
       const { category, fromList, toList, itemId } = await req.json()
       
       // Validate inputs
-      const allowedCategories = ['movies', 'anime', 'shows', 'books', 'music', 'games']
+      const allowedCategories = ['movies', 'anime', 'shows', 'books', 'songs', 'games']
       const allowedLists = ['planned', 'inProgress', 'completed']
       
       if (!allowedCategories.includes(category) || 

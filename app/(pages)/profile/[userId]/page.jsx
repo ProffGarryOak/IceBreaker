@@ -41,7 +41,7 @@ const CATEGORY_STYLES = {
     border: 'border-amber-600',
     text: 'text-amber-600'
   },
-  music: { 
+  songs: { 
     icon: <Headphones className="h-5 w-5 text-purple-400" />, 
     name: 'Sonic Galaxy',
     bg: 'bg-purple-400/10',

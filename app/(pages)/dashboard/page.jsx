@@ -162,6 +162,7 @@ export default function DashboardPage() {
   };
 
   const removeContentItem = async (itemId) => {
+    console.log("Removing item:", itemId);
     try {
       setContent((prev) => {
         const newContent = { ...prev };
@@ -332,24 +333,25 @@ export default function DashboardPage() {
 
       <div className="mb-6">
         {/* Category Tabs - Horizontal Scrollable */}
-        <div className="w-full pb-2">
+        <div className="w-full pb-2 overflow-x-auto relative z-10 mt-4">
           <Tabs defaultValue="movies">
-            <TabsList className="flex w-max bg-transparent gap-2 p-1">
+            <TabsList className="flex w-max min-w-full bg-transparent gap-2 p-1 mt-2 pl-152 sm:pl-0">
               {contentCategories.map((category) => {
                 const isActive = activeCategory === category.id;
-                const activeColorClass = category.color.split(" ")[0]; // Get the bg-color class
-                const textColorClass = category.color.split(" ")[2]; // Get the text-color class
+                const activeColorClass = category.color.split(" ")[0];
+                const textColorClass = category.color.split(" ")[2];
 
                 return (
                   <motion.div
                     key={category.id}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
+                    className="flex-shrink-0"
                   >
                     <TabsTrigger
                       value={category.id}
                       onClick={() => setActiveCategory(category.id)}
-                      className={`relative flex items-center gap-2 px-10 py-2 rounded-xl transition-all ${
+                      className={`relative flex items-center gap-2 px-4 sm:px-10 py-2 rounded-xl transition-all ${
                         isActive
                           ? `${activeColorClass} border-2 ${textColorClass.replace(
                               "text-",
@@ -408,36 +410,35 @@ export default function DashboardPage() {
         </div>
 
         {/* Status Filters - Full Width Grid */}
-        <div className="flex gap-4 mt-10">
-  {statusOptions.map((status) => {
-    const isActive = activeStatus === status.id;
-    const textColorClass = status.color.split(" ")[2]; // Get the text-color class
+        <div className="flex flex-wrap gap-2 mt-6">
+          {statusOptions.map((status) => {
+            const isActive = activeStatus === status.id;
+            const textColorClass = status.color.split(" ")[2];
 
-    return (
-      <motion.button
-        key={status.id}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setActiveStatus(status.id)}
-        className={`relative pb-1 text-sm font-medium transition-colors ${
-          isActive ? textColorClass : "text-gray-400"
-        }`}
-      >
-        {status.name}
-        <span className="absolute bottom-0 left-0 right-0 h-0.5">
-          {isActive && (
-            <motion.span
-              className={`absolute bottom-0 left-0 right-0 h-0.5 ${textColorClass} bg-current`}
-              layoutId="statusUnderline"
-              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-            />
-          )}
-        </span>
-        
-      </motion.button>
-    );
-  })}
-</div>
+            return (
+              <motion.button
+                key={status.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveStatus(status.id)}
+                className={`relative pb-1 text-sm font-medium transition-colors ${
+                  isActive ? textColorClass : "text-gray-400"
+                }`}
+              >
+                {status.name}
+                <span className="absolute bottom-0 left-0 right-0 h-0.5">
+                  {isActive && (
+                    <motion.span
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 ${textColorClass} bg-current`}
+                      layoutId="statusUnderline"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Content Section */}
@@ -448,20 +449,26 @@ export default function DashboardPage() {
               <div className={`p-2 rounded-lg ${activeCategoryData?.color}`}>
                 {activeCategoryData?.icon}
               </div>
-              <CardTitle className="text-white">
-                {activeCategoryData?.name} - {activeStatusData?.name}
-              </CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-white">
+                  {activeCategoryData?.name} - {activeStatusData?.name}
+                </CardTitle>
+                <Link href={`/${activeCategory}`}>
+                  <Button variant="outline" size="icon" className="h-8 w-8 sm:hidden">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
 
-            <div className="flex gap-2">
-              <Link href={`/${activeCategory}`}>
+            <div className="flex flex-wrap gap-2 mt-4 sm:mt-0 items-center">
+              <Link href={`/${activeCategory}`} className="hidden sm:block sm:ml-auto">
                 <Button variant="outline" className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add {activeCategoryData?.name}
                 </Button>
               </Link>
-
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Badge
                   variant="outline"
                   className="border-blue-700 text-blue-700"

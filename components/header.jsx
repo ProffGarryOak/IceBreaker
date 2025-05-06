@@ -24,6 +24,8 @@ import {
   Gamepad2,
   BookOpen,
   ListCollapse,
+  Menu,
+  X,
 } from "lucide-react";
 import {
   ClerkProvider,
@@ -33,6 +35,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { useState, useEffect, useRef } from "react";
 
 const contentRoutes = [
   {
@@ -74,6 +77,29 @@ const contentRoutes = [
 ];
 
 export function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef(null);
+  const hamburgerRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        isMobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black bg-black backdrop-blur supports-[backdrop-filter]:bg-black/70 text-white">
       <div className="container flex h-16 items-center px-4 sm:px-6">
@@ -89,7 +115,7 @@ export function Header() {
               alt="Ice Breaker Logo"
               width={28} 
               height={28}
-              className="h-15 w-15" // Adjust if needed
+              className="h-15 w-15"
             />
             <span className="hidden sm:inline">Ice Breaker</span>
           </Link>
@@ -178,8 +204,21 @@ export function Header() {
           </nav>
         </div>
 
+        {/* Mobile Menu Button */}
+        <button
+          ref={hamburgerRef}
+          className="md:hidden ml-auto mr-4"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+
         {/* Right Section - User Controls */}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="hidden md:flex items-center gap-2 ml-auto">
           {/* IceCard Button */}
 
           <SignedOut>
@@ -211,6 +250,90 @@ export function Header() {
           </SignedIn>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div 
+          ref={mobileMenuRef}
+          className="md:hidden bg-black border-t border-gray-800 fixed inset-x-0 top-16"
+        >
+          <div className="container px-4 py-4 space-y-4">
+            <SignedIn>
+              <Link href="/card" className="flex items-center gap-2 text-white hover:text-white/80">
+                <Snowflake className="h-4 w-4" />
+                IceCard
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <Link href="#card" className="flex items-center gap-2 text-white hover:text-white/80">
+                <Snowflake className="h-4 w-4" />
+                IceCard
+              </Link>
+            </SignedOut>
+
+            <div className="space-y-2">
+              {contentRoutes.map((item) => (
+                <Link
+                  key={item.route}
+                  href={item.route}
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded-md ${item.color}`}
+                >
+                  {item.icon}
+                  {item.title}
+                </Link>
+              ))}
+            </div>
+
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 text-white hover:text-white/80"
+              >
+                <Compass className="h-4 w-4" />
+                Dashboard
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href="#explore"
+                className="flex items-center gap-2 text-white hover:text-white/80"
+              >
+                <Compass className="h-4 w-4" />
+                Explore
+              </Link>
+            </SignedOut>
+
+            <div className="pt-4 border-t border-gray-800">
+              <SignedOut>
+                <div className="flex flex-col gap-2">
+                  <SignInButton>
+                    <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-600 hover:to-purple-600 shadow-lg px-4 py-2 rounded-md hover:shadow-purple-500/30 transition-all">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                  <SignUpButton>
+                    <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-blue-600 shadow-lg px-4 py-2 rounded-md hover:shadow-purple-500/30 transition-all">
+                      Sign Up
+                    </button>
+                  </SignUpButton>
+                </div>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center gap-2">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        userButtonBox:
+                          "border-2 border-blue-400/50 rounded-full shadow-md hover:shadow-lg transition-all",
+                      },
+                    }}
+                  />
+                </div>
+              </SignedIn>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

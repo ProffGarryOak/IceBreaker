@@ -3,18 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Headphones, Star, Flame, Trophy, Sparkles, Clock, Search, Heart, Share2, Play, LoaderCircle, Check, X, BookOpen, Bookmark, ClipboardCheck, ClipboardList, ClipboardCopy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 3000);
+    }, 750);
     
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+  const bgColor = type === 'success' ? 'bg-green-900/70' : 'bg-red-500';
   
   return (
     <motion.div
@@ -26,37 +27,6 @@ const Toast = ({ message, type, onClose }) => {
       {type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
       {message}
     </motion.div>
-  );
-};
-
-// Tooltip component
-const Tooltip = ({ content, children }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  return (
-    <div 
-      className="relative"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onFocus={() => setIsVisible(true)}
-      onBlur={() => setIsVisible(false)}
-    >
-      {children}
-      
-      <AnimatePresence>
-        {isVisible && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-900 text-white text-xs rounded-md shadow-lg whitespace-nowrap z-50"
-          >
-            {content}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 };
 
@@ -147,50 +117,71 @@ const SongCard = ({ song, isHovered, onHover }) => {
               animate={{ opacity: 1 }}
               className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4 gap-2"
             >
-              <Tooltip content="Add to Listened">
-                <button 
-                  className={`p-3 border-2 border-purple-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
-                  onClick={() => !isAdding.completed && addToCollection('completed')}
-                  disabled={isAdding.completed}
-                  aria-label="Add to Listened"
-                >
-                  {isAdding.completed ? (
-                    <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
-                  ) : (
-                    <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
-                  )}
-                </button>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      className={`p-3 border-2 border-purple-500 rounded-full bg-gray-500/20 hover:bg-green-500/30 transition shadow-lg relative ${isAdding.completed ? 'opacity-50' : ''}`}
+                      onClick={() => !isAdding.completed && addToCollection('completed')}
+                      disabled={isAdding.completed}
+                      aria-label="Add to Listened"
+                    >
+                      {isAdding.completed ? (
+                        <LoaderCircle className="w-5 h-5 text-green-500 animate-spin" />
+                      ) : (
+                        <ClipboardCheck className="w-5 h-5 text-green-500 font-extrabold" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-gray-800 text-white border-gray-700">
+                    <p>Add to Listened</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               
-              <Tooltip content="Add to Currently Playing">
-                <button 
-                  className={`p-3 border-2 border-purple-500 bg-gray-100/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
-                  onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
-                  disabled={isAdding.inProgress}
-                  aria-label="Add to Currently Playing"
-                >
-                  {isAdding.inProgress ? (
-                    <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
-                  ) : (
-                    <ClipboardCopy className="w-5 h-5 text-rose-500" />
-                  )}
-                </button>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      className={`p-3 border-2 border-purple-500 bg-gray-100/20 rounded-full hover:bg-rose-500/30 transition shadow-lg relative ${isAdding.inProgress ? 'opacity-50' : ''}`}
+                      onClick={() => !isAdding.inProgress && addToCollection('inProgress')}
+                      disabled={isAdding.inProgress}
+                      aria-label="Add to Currently Playing"
+                    >
+                      {isAdding.inProgress ? (
+                        <LoaderCircle className="w-5 h-5 text-rose-500 animate-spin" />
+                      ) : (
+                        <ClipboardCopy className="w-5 h-5 text-rose-500" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-gray-800 text-white border-gray-700">
+                    <p>Add to Currently Playing</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               
-              <Tooltip content="Add to Listen Later">
-                <button 
-                  className={`p-3 border-2 border-purple-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
-                  onClick={() => !isAdding.planned && addToCollection('planned')}
-                  disabled={isAdding.planned}
-                  aria-label="Add to Listen Later"
-                >
-                  {isAdding.planned ? (
-                    <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
-                  ) : (
-                    <ClipboardList className="w-5 h-5 text-blue-500" />
-                  )}
-                </button>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      className={`p-3 border-2 border-purple-500 bg-gray-500/20 rounded-full hover:bg-blue-500/30 transition shadow-lg relative ${isAdding.planned ? 'opacity-50' : ''}`}
+                      onClick={() => !isAdding.planned && addToCollection('planned')}
+                      disabled={isAdding.planned}
+                      aria-label="Add to Listen Later"
+                    >
+                      {isAdding.planned ? (
+                        <LoaderCircle className="w-5 h-5 text-blue-500 animate-spin" />
+                      ) : (
+                        <ClipboardList className="w-5 h-5 text-blue-500" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-gray-800 text-white border-gray-700">
+                    <p>Add to Listen Later</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </motion.div>
           )}
           {song.trackRating && (
@@ -310,125 +301,127 @@ const Songs = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-br from-[#2e4531] to-purple-900 p-6 md:p-10"
-    >
-      <AnimatePresence>
-        {globalToast.show && (
-          <Toast 
-            message={globalToast.message} 
-            type={globalToast.type} 
-            onClose={closeGlobalToast} 
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="flex flex-col items-center mb-12"
-        >
-          <motion.div
-            animate={{ 
-              rotate: [0, 10, -10, 0],
-            }}
-            transition={{ 
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <Music className="w-12 h-12 text-purple-500 mb-4" />
-          </motion.div>
-          <h1 className="text-4xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
-            Sound Waves
-          </h1>
-          <p className="text-gray-400 mb-6 text-center max-w-lg">
-            Discover music that moves you
-          </p>
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search for songs, artists..."
-              className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+    <TooltipProvider>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-gradient-to-br from-[#2e4531] to-purple-900 p-6 md:p-10"
+      >
+        <AnimatePresence>
+          {globalToast.show && (
+            <Toast 
+              message={globalToast.message} 
+              type={globalToast.type} 
+              onClose={closeGlobalToast} 
             />
+          )}
+        </AnimatePresence>
+
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="flex flex-col items-center mb-12"
+          >
+            <motion.div
+              animate={{ 
+                rotate: [0, 10, -10, 0],
+              }}
+              transition={{ 
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Music className="w-12 h-12 text-purple-500 mb-4" />
+            </motion.div>
+            <h1 className="text-4xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
+              Sound Waves
+            </h1>
+            <p className="text-gray-400 mb-6 text-center max-w-lg">
+              Discover music that moves you
+            </p>
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search for songs, artists..."
+                className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </motion.div>
+
+          {searchQuery ? (
+            <SongSection 
+              title={`Search: ${searchQuery}`} 
+              searchTerm={searchQuery}
+              icon="sparkles" 
+              color="text-purple-500" 
+            />
+          ) : (
+            <>
+              <SongSection 
+                title="🔥 Hot Right Now" 
+                searchTerm="top songs 2025"
+                icon="flame" 
+                color="text-red-500" 
+              />
+              <SongSection 
+                title="🏆 All-Time Hits" 
+                searchTerm="classic hits"
+                icon="trophy" 
+                color="text-amber-500" 
+              />
+              <SongSection 
+                title="🆕 New Releases" 
+                searchTerm="new music this week"
+                icon="clock" 
+                color="text-blue-400" 
+              />
+              <SongSection 
+                title="🎧 Your Vibes" 
+                searchTerm="sexy"
+                icon="headphones" 
+                color="text-green-400" 
+              />
+            </>
+          )}
+        </div>
+
+        {/* Floating decoration */}
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="fixed bottom-8 right-8 z-10 hidden md:block"
+        >
+          <div className="relative">
+            <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+              <Headphones className="w-8 h-8 text-white" />
+            </div>
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.8, 1, 0.8]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity
+              }}
+              className="absolute -top-2 -right-2 bg-purple-400 px-2 py-1 rounded-full text-xs text-gray-900 font-bold"
+            >
+              JAM!
+            </motion.div>
           </div>
         </motion.div>
-
-        {searchQuery ? (
-          <SongSection 
-            title={`Search: ${searchQuery}`} 
-            searchTerm={searchQuery}
-            icon="sparkles" 
-            color="text-purple-500" 
-          />
-        ) : (
-          <>
-            <SongSection 
-              title="🔥 Hot Right Now" 
-              searchTerm="top songs 2025"
-              icon="flame" 
-              color="text-red-500" 
-            />
-            <SongSection 
-              title="🏆 All-Time Hits" 
-              searchTerm="classic hits"
-              icon="trophy" 
-              color="text-amber-500" 
-            />
-            <SongSection 
-              title="🆕 New Releases" 
-              searchTerm="new music this week"
-              icon="clock" 
-              color="text-blue-400" 
-            />
-            <SongSection 
-              title="🎧 Your Vibes" 
-              searchTerm="sexy"
-              icon="headphones" 
-              color="text-green-400" 
-            />
-          </>
-        )}
-      </div>
-
-      {/* Floating decoration */}
-      <motion.div
-        animate={{
-          y: [0, -20, 0],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="fixed bottom-8 right-8 z-10 hidden md:block"
-      >
-        <div className="relative">
-          <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
-            <Headphones className="w-8 h-8 text-white" />
-          </div>
-          <motion.div
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity
-            }}
-            className="absolute -top-2 -right-2 bg-purple-400 px-2 py-1 rounded-full text-xs text-gray-900 font-bold"
-          >
-            JAM!
-          </motion.div>
-        </div>
       </motion.div>
-    </motion.div>
+    </TooltipProvider>
   );
 };
 
