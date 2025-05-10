@@ -1,7 +1,8 @@
 # IceBreaker
 
 **Website**: [nicebreaker.vercel.app](https://nicebreaker.vercel.app)
-![image](https://github.com/user-attachments/assets/7f86b1e6-8698-4f6e-af80-a60e4107b080)
+![image](https://github.com/user-attachments/assets/d2c4711c-e41f-485b-be3d-15b6e17e0ee5)
+
 
 ## Overview
 
