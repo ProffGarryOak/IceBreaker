@@ -23,7 +23,8 @@ import {
   Snowflake,
   PersonStanding,
   Clock,
-  Trophy
+  Trophy,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -101,6 +102,192 @@ const statusOptions = [
       "bg-emerald-700/20 border-emerald-700 text-emerald-700 hover:bg-emerald-700/30",
   },
 ];
+
+const AIRecommendations = ({ content, activeCategory }) => {
+  const [recommendations, setRecommendations] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchRecommendations = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get top 20 completed items from the active category
+      const topCompleted =
+        content?.[activeCategory]?.completed?.slice(0, 20) || [];
+      if (topCompleted.length === 0) {
+        setRecommendations([]);
+        return;
+      }
+
+      const prompt = `Based on these ${activeCategory} that I've watched/read: ${topCompleted
+        .map((item) => item.title)
+        .join(", ")}. 
+      Recommend 5 similar ${activeCategory} I might enjoy. 
+      Return only a JSON array of objects with title, description, and reason fields.  description should be a brief summary of that in 15 words, and reason should explain why you think I would like it based on my watched list in 10 words.
+      Return the response in this format:
+      Example: [{"title": "Example", "description": "A great example", "reason": "You liked similar things"}]`;
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt,
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch recommendations");
+
+      const data = await response.json();
+      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      try {
+        // Remove Markdown code block markers if present
+        const cleanedText = textResponse
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```$/i, "")
+          .trim();
+
+        const parsedResponse = JSON.parse(cleanedText);
+
+        console.log("Parsed recommendations:", parsedResponse);
+
+        setRecommendations(parsedResponse);
+      } catch (e) {
+        console.error("Failed to parse response:", textResponse);
+        throw new Error("Invalid response format from AI");
+      }
+    } catch (err) {
+      console.error("Recommendation error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (content && activeCategory) {
+      fetchRecommendations();
+    }
+  }, [content, activeCategory]);
+
+  if (!content || !content[activeCategory]?.completed?.length) {
+    return null;
+  }
+
+  return (
+    <Card className="bg-gray-800 border-gray-700 mt-8">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-purple-500/20 border-purple-500 text-purple-500">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <CardTitle className="text-white">
+            AI Recommendations For You
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={fetchRecommendations}
+            disabled={loading}
+            className="ml-auto text-rose-400 hover:text-rose-500/50 hover:bg-red-100/0  text-sm flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-64 w-full bg-gray-700 rounded-lg"
+              />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex items-center gap-3 text-red-400">
+            <AlertCircle className="h-5 w-5" />
+            <p>Error fetching recommendations: {error}</p>
+          </div>
+        ) : recommendations?.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {recommendations.map((rec, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.05 }}
+                className="relative group"
+              >
+                <Card className="h-full bg-gray-900 border-gray-700 hover:border-purple-400 transition-colors flex flex-col">
+  <CardContent className="p-0 flex flex-col flex-1">
+    <div className="p-4 flex flex-col flex-1">
+      <h3 className="text-white font-semibold">
+        {rec.title}
+      </h3>
+
+      {rec.description && (
+        <p className="text-sm text-gray-400 mt-1">
+          {rec.description}
+        </p>
+      )}
+
+      {rec.reason && (
+        <p className="text-xs text-purple-300 mt-2">
+          {rec.reason}
+        </p>
+      )}
+
+      <div className="mt-auto">
+        {/* <Button
+          variant="outline"
+          size="sm"
+          className="w-full mt-3 gap-2 bg-purple-900/20 hover:bg-purple-900/30 border-purple-700 text-purple-300"
+        >
+          <Plus className="h-4 w-4" />
+          <Link href={`/${activeCategory}`}>Add to Watchlist</Link>
+        </Button> */}
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-gray-500 text-center py-8">
+            <p>
+              No recommendations available. Watch more {activeCategory} to get
+              personalized suggestions.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -215,7 +402,6 @@ export default function DashboardPage() {
     return stats;
   };
 
-  // Added function to calculate estimated time
   const calculateTotalTime = (content) => {
     if (!content || typeof content !== "object") return 0;
     const totalItems = calculateTotalItems(content);
@@ -282,9 +468,9 @@ export default function DashboardPage() {
           value={
             content
               ? Object.entries(categoryStats).reduce(
-                  (top, [category, stats]) => 
-                    stats.total > (top?.stats?.total || 0) 
-                      ? { category, stats } 
+                  (top, [category, stats]) =>
+                    stats.total > (top?.stats?.total || 0)
+                      ? { category, stats }
                       : top,
                   { category: "", stats: { total: 0 } }
                 ).category || "--"
@@ -299,7 +485,7 @@ export default function DashboardPage() {
           value={(() => {
             if (error) return "Error";
             if (!content) return "--";
-            
+
             const totalItems = calculateTotalItems(content);
             if (totalItems >= 500) return " God Mode";
             if (totalItems >= 200) return "Pro Watcher";
@@ -309,18 +495,18 @@ export default function DashboardPage() {
           })()}
           icon={(() => {
             if (error) return <AlertCircle className="h-5 w-5" />;
-            
+
             const totalItems = calculateTotalItems(content);
             if (totalItems >= 500) return <Snowflake className="h-5 w-5" />;
             if (totalItems >= 200) return <Film className="h-5 w-5" />;
             if (totalItems >= 75) return <Tv2 className="h-5 w-5" />;
-            if (totalItems >=30) return <Eye className="h-5 w-5" />;
+            if (totalItems >= 30) return <Eye className="h-5 w-5" />;
             return <UserIcon className="h-5 w-5" />;
           })()}
           loading={loading}
           status={(() => {
             if (error) return "error";
-            
+
             const totalItems = calculateTotalItems(content);
             if (totalItems >= 500) return "god";
             if (totalItems >= 200) return "pro";
@@ -408,7 +594,10 @@ export default function DashboardPage() {
             </TabsList>
           </Tabs>
         </div>
-
+{/* AI Recommendations Section */}
+      {content && content[activeCategory]?.completed?.length > 0 && (
+        <AIRecommendations content={content} activeCategory={activeCategory} />
+      )}
         {/* Status Filters - Full Width Grid */}
         <div className="flex flex-wrap gap-2 mt-6">
           {statusOptions.map((status) => {
@@ -431,7 +620,11 @@ export default function DashboardPage() {
                     <motion.span
                       className={`absolute bottom-0 left-0 right-0 h-0.5 ${textColorClass} bg-current`}
                       layoutId="statusUnderline"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
                     />
                   )}
                 </span>
@@ -454,7 +647,11 @@ export default function DashboardPage() {
                   {activeCategoryData?.name} - {activeStatusData?.name}
                 </CardTitle>
                 <Link href={`/${activeCategory}`}>
-                  <Button variant="outline" size="icon" className="h-8 w-8 sm:hidden">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 sm:hidden"
+                  >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -462,7 +659,10 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 mt-4 sm:mt-0 items-center">
-              <Link href={`/${activeCategory}`} className="hidden sm:block sm:ml-auto">
+              <Link
+                href={`/${activeCategory}`}
+                className="hidden sm:block sm:ml-auto"
+              >
                 <Button variant="outline" className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add {activeCategoryData?.name}
@@ -604,36 +804,39 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      
     </div>
   );
 }
 
-function DashboardStat({ title, value, icon, loading, status="normal" }) {
+function DashboardStat({ title, value, icon, loading, status = "normal" }) {
   const statusColors = {
     normal: "bg-purple-600/5 border-gray-700/50",
     success: "bg-green-900/50 border-green-800",
     error: "bg-red-900/50 border-red-800",
-    god: "bg-gradient-to-r from-rose-900 via-rose-400 to-rose-800 border-rose-700",   // diamond
+    god: "bg-gradient-to-r from-rose-900 via-rose-400 to-rose-800 border-rose-700", // diamond
     pro: "bg-gradient-to-r from-yellow-900 via-yellow-600 to-yellow-500 border-yellow-600", // gold
-    binge: "bg-gradient-to-r from-slate-800 to-slate-500 border-slate-400",     // silver
-    casual: "bg-gradient-to-r from-amber-950 to-amber-600 border-amber-700",  // bronze
-    noob: "bg-yellow-950/50 border-yellow-800" // wood (plain, rugged look)
+    binge: "bg-gradient-to-r from-slate-800 to-slate-500 border-slate-400", // silver
+    casual: "bg-gradient-to-r from-amber-950 to-amber-600 border-amber-700", // bronze
+    noob: "bg-yellow-950/50 border-yellow-800", // wood (plain, rugged look)
   };
-  
+
   const textColors = {
     normal: "text-white",
     success: "text-green-400",
     error: "text-red-400",
-    god: "text-amber-200",     // diamond
-    pro: "text-yellow-300",     // gold
-    binge: "text-slate-300",    // silver
-    casual: "text-amber-400",   // bronze
-    noob: "text-yellow-900"     // wood
+    god: "text-amber-200", // diamond
+    pro: "text-yellow-300", // gold
+    binge: "text-slate-300", // silver
+    casual: "text-amber-400", // bronze
+    noob: "text-yellow-900", // wood
   };
-  
 
   return (
-    <Card className={`${statusColors[status]} transition-all hover:scale-[1.02]`}>
+    <Card
+      className={`${statusColors[status]} transition-all hover:scale-[1.02]`}
+    >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium text-gray-400">
