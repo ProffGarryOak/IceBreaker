@@ -27,7 +27,7 @@ jobs:
         run: npm run lint
 
   build:
-    environment: Production – icebreaker
+    environment: test
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +54,7 @@ jobs:
         run: npm run build
 
   test:
-    environment: Production – icebreaker
+    environment: test
     needs: build
     runs-on: ubuntu-latest
     steps:
