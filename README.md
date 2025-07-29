@@ -3,7 +3,8 @@
   <strong>Smart Media Tracker • Social Starter Pack • AI-Powered Recommendations</strong>
 </p>
 <p align="center">
-  <img src="./path-to/cover.png" alt="IceBreaker UI preview" width="800"/>
+ <img width="1919" height="581" alt="image" src="https://github.com/user-attachments/assets/f04e60a5-fddf-4518-9799-7f5f049993eb" />
+
 </p>
 
 ---
@@ -60,4 +61,34 @@ Your own digital personality card for the pop culture universe 💬🎬📚🎮
 ---
 
 
+## 🤖 AI Features Powered by Gemini
+
+* 🎯 **Authenticity Checks** for user-uploaded media
+* 🔮 **Smart Descriptions** auto-generated from metadata
+* 🧠 **Content Suggestions** based on interests and patterns
+
+---
+
+## 🎯 Project Highlights
+
+* ⚡ SSR + ISR + RSC = Speed Demon
+* 🌈 Framer Motion 60fps Animations
+* 🧩 Modular Pages + Data-Fetching
+* 🧠 Real-Time Updates via Mongoose Change Streams
+* 🖼 HTML-to-Image Export + QR Profile Cards
+
+---
+
+## 👨‍💻 Author
+
+**@shubh**
+Follow the journey: [LinkedIn](https://linkedin.com/in/adarshpandey1133) • [GitHub](https://github.com/proffgarryoak)
+
+---
+
+## 🧊 License
+
+MIT — feel free to use, remix, and **Ice Break** 🔥
+
+---
 
