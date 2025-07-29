@@ -27,6 +27,7 @@ jobs:
         run: npm run lint
 
   build:
+    environment: Production – icebreaker
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -41,6 +42,7 @@ jobs:
       - name: 📦 Install Deps
         run: npm install
 
+
       - name: Create .env.local
         run: |
           echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
@@ -52,6 +54,7 @@ jobs:
         run: npm run build
 
   test:
+    environment: Production – icebreaker
     needs: build
     runs-on: ubuntu-latest
     steps:
