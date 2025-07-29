@@ -26,8 +26,26 @@ jobs:
       - name: ✨ Lint Code
         run: npm run lint
 
-  test:
+  build:
     needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧼 Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🧠 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: 📦 Install Deps
+        run: npm install
+
+      - name: 🏗️ Build App
+        run: npm run build
+
+  test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: 🧼 Checkout Code
