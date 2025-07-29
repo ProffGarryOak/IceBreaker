@@ -506,7 +506,7 @@ export default function Landing() {
                 transition={{ delay: 0.1 }}
                 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight"
               >
-                Welcome Your Content Universe <br />
+                Welcome to Your Content Universe <br />
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentTagline}
