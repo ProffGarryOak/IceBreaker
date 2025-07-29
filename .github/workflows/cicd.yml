@@ -25,6 +25,7 @@ jobs:
         run: npm run lint
 
   build:
+    environment: test
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +54,7 @@ jobs:
 
 
   deploy:
+    environment: test
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
