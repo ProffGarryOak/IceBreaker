@@ -2,6 +2,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useContentStore } from "@/lib/store";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -25,6 +26,7 @@ import {
   Clock,
   Trophy,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -81,27 +83,238 @@ const contentCategories = [
   },
 ];
 
+const getStatusLabels = (categoryId) => {
+  switch (categoryId) {
+    case "books":
+      return {
+        planned: "Read Later",
+        inProgress: "Reading",
+        completed: "Read",
+      };
+    case "games":
+      return {
+        planned: "Play Later",
+        inProgress: "Playing",
+        completed: "Played",
+      };
+    case "songs":
+      return {
+        planned: "Listen Later",
+        inProgress: "Listening",
+        completed: "Listened",
+      };
+    default:
+      return {
+        planned: "Watch Later",
+        inProgress: "Watching",
+        completed: "Watched",
+      };
+  }
+};
+
 const statusOptions = [
   {
     id: "planned",
-    name: "Watch Later",
     icon: <Plus className="h-5 w-5" />,
     color: "bg-blue-700/20 border-blue-700 text-blue-700 hover:bg-blue-700/30",
   },
   {
     id: "inProgress",
-    name: "Watching",
     icon: <Play className="h-5 w-5" />,
     color: "bg-rose-700/20 border-rose-700 text-rose-700 hover:bg-rose-700/30",
   },
   {
     id: "completed",
-    name: "Watched",
     icon: <Check className="h-5 w-5" />,
     color:
       "bg-emerald-700/20 border-emerald-700 text-emerald-700 hover:bg-emerald-700/30",
   },
 ];
+
+const FALLBACK_RECOMMENDATIONS = {
+  movies: [
+    {
+      title: "Inception",
+      description:
+        "A thief who steals corporate secrets through the use of dream-sharing technology.",
+      reason: "Mind-bending sci-fi thriller",
+    },
+    {
+      title: "The Dark Knight",
+      description:
+        "Batman sets out to dismantle the remaining criminal organizations that plague the streets.",
+      reason: "Gritty superhero masterpiece",
+    },
+    {
+      title: "Interstellar",
+      description:
+        "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+      reason: "Epic space exploration",
+    },
+    {
+      title: "Parasite",
+      description:
+        "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+      reason: "Social commentary with a twist",
+    },
+    {
+      title: "Spirited Away",
+      description: "A young girl creates a bond with the spirits of the world.",
+      reason: "Beautiful animation and story",
+    },
+  ],
+  shows: [
+    {
+      title: "Breaking Bad",
+      description:
+        "A high school chemistry teacher turned methamphetamine manufacturing drug dealer.",
+      reason: "Character study of transformation",
+    },
+    {
+      title: "Game of Thrones",
+      description:
+        "Nine noble families fight for control over the lands of Westeros.",
+      reason: "Epic fantasy drama",
+    },
+    {
+      title: "Stranger Things",
+      description:
+        "When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces.",
+      reason: "80s nostalgia and mystery",
+    },
+    {
+      title: "Black Mirror",
+      description:
+        "An anthology series exploring a twisted, high-tech multiverse where humanity's greatest innovations and darkest instincts collide.",
+      reason: "Thought-provoking sci-fi",
+    },
+    {
+      title: "The Office",
+      description:
+        "A mockumentary on a group of typical office workers, where the workday consists of ego clashes, inappropriate behavior, and tedium.",
+      reason: "Classic workplace comedy",
+    },
+  ],
+  anime: [
+    {
+      title: "Fullmetal Alchemist: Brotherhood",
+      description:
+        "Two brothers search for a Philosopher's Stone after an attempt to revive their deceased mother goes wrong.",
+      reason: "Epic adventure and heart",
+    },
+    {
+      title: "Attack on Titan",
+      description:
+        "After his hometown is destroyed and his mother is killed, young Eren Jaeger vows to cleanse the earth of the giant humanoid Titans.",
+      reason: "Intense action and mystery",
+    },
+    {
+      title: "Death Note",
+      description:
+        "An intelligent high school student goes on a secret crusade to eliminate criminals from the world after discovering a notebook capable of killing anyone whose name is written into it.",
+      reason: "Psychological thriller",
+    },
+    {
+      title: "One Piece",
+      description: "Changes the world into a pirate era.",
+      reason: "Grand adventure",
+    },
+    {
+      title: "Demon Slayer",
+      description:
+        "A family is attacked by demons and only two members survive.",
+      reason: "Stunning animation",
+    },
+  ],
+  books: [
+    {
+      title: "1984",
+      description:
+        "A dystopian social science fiction novel and cautionary tale.",
+      reason: "Classic dystopian fiction",
+    },
+    {
+      title: "The Hobbit",
+      description:
+        "Bilbo Baggins, a hobbit, is swept into an epic quest to reclaim the lost Kingdom of Erebor.",
+      reason: "Fantasy adventure origin",
+    },
+    {
+      title: "Dune",
+      description:
+        "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides.",
+      reason: "Sci-fi epic",
+    },
+    {
+      title: "Project Hail Mary",
+      description:
+        "Ryland Grace is the sole survivor on a desperate, last-chance mission—and if he fails, humanity and the earth itself will perish.",
+      reason: "Scientific problem solving",
+    },
+    {
+      title: "The Name of the Wind",
+      description:
+        "The story of Kovthe, a magically gifted young man who grows to be the most notorious wizard his world has ever seen.",
+      reason: "Beautiful prose and magic",
+    },
+  ],
+  songs: [
+    {
+      title: "Bohemian Rhapsody",
+      description: "Queen's operatic rock masterpiece.",
+      reason: "Musical journey",
+    },
+    {
+      title: "Hotel California",
+      description: "The Eagles' iconic tale of excess.",
+      reason: "Classic rock staple",
+    },
+
+    {
+      title: "Blinding Lights",
+      description: "The Weeknd's synth-pop hit.",
+      reason: "Modern retro vibes",
+    },
+    {
+      title: "Rolling in the Deep",
+      description: "Adele's powerful soul ballad.",
+      reason: "Vocal powerhouse",
+    },
+    {
+      title: "Billie Jean",
+      description: "Michael Jackson's funk-pop classic.",
+      reason: "Pop perfection",
+    },
+  ],
+  games: [
+    {
+      title: "Elden Ring",
+      description: "An action role-playing game developed by FromSoftware.",
+      reason: "Open world mastery",
+    },
+    {
+      title: "The Witcher 3",
+      description: "Geralt of Rivia searches for his adopted daughter.",
+      reason: "Story-rich RPG",
+    },
+    {
+      title: "Minecraft",
+      description: "A sandbox video game developed by Mojang.",
+      reason: "Creative freedom",
+    },
+
+    {
+      title: "Zelda: Breath of the Wild",
+      description: "Link awakens from a 100-year slumber.",
+      reason: "Adventure redefined",
+    },
+    {
+      title: "Red Dead Redemption 2",
+      description: "Arthur Morgan and the Van der Linde gang.",
+      reason: "Immersive open world",
+    },
+  ],
+};
 
 const AIRecommendations = ({ content, activeCategory }) => {
   const [recommendations, setRecommendations] = useState(null);
@@ -174,7 +387,8 @@ const AIRecommendations = ({ content, activeCategory }) => {
       }
     } catch (err) {
       console.error("Recommendation error:", err);
-      setError(err.message);
+      // Use category specific fallback
+      setRecommendations(FALLBACK_RECOMMENDATIONS[activeCategory] || []);
     } finally {
       setLoading(false);
     }
@@ -231,48 +445,44 @@ const AIRecommendations = ({ content, activeCategory }) => {
             <p>Error fetching recommendations: {error}</p>
           </div>
         ) : recommendations?.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 sm:overflow-visible sm:pb-0">
             {recommendations.map((rec, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: index * 0.05 }}
-                className="relative group"
+                className="relative group h-full flex-shrink-0 w-[85vw] sm:w-auto snap-center"
               >
-                <Card className="h-full bg-gray-900 border-gray-700 hover:border-purple-400 transition-colors flex flex-col">
-  <CardContent className="p-0 flex flex-col flex-1">
-    <div className="p-4 flex flex-col flex-1">
-      <h3 className="text-white font-semibold">
-        {rec.title}
-      </h3>
+                <Link href={`/${activeCategory}`} className="block h-full">
+                  <Card className="h-full bg-gray-900 border-gray-700 hover:border-purple-400 transition-colors flex flex-col cursor-pointer">
+                    <CardContent className="p-0 flex flex-col flex-1">
+                      <div className="p-4 flex flex-col flex-1">
+                        <h3 className="text-white font-semibold">
+                          {rec.title}
+                        </h3>
 
-      {rec.description && (
-        <p className="text-sm text-gray-400 mt-1">
-          {rec.description}
-        </p>
-      )}
+                        {rec.description && (
+                          <p className="text-sm text-gray-400 mt-1 line-clamp-3">
+                            {rec.description}
+                          </p>
+                        )}
 
-      {rec.reason && (
-        <p className="text-xs text-purple-300 mt-2">
-          {rec.reason}
-        </p>
-      )}
+                        {rec.reason && (
+                          <p className="text-xs text-purple-300 mt-2">
+                            {rec.reason}
+                          </p>
+                        )}
 
-      <div className="mt-auto">
-        {/* <Button
-          variant="outline"
-          size="sm"
-          className="w-full mt-3 gap-2 bg-purple-900/20 hover:bg-purple-900/30 border-purple-700 text-purple-300"
-        >
-          <Plus className="h-4 w-4" />
-          <Link href={`/${activeCategory}`}>Add to Watchlist</Link>
-        </Button> */}
-      </div>
-    </div>
-  </CardContent>
-</Card>
-
+                        <div className="mt-auto pt-2">
+                          <span className="text-xs text-blue-400 hover:underline">
+                            View in {activeCategory} &rarr;
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -291,95 +501,41 @@ const AIRecommendations = ({ content, activeCategory }) => {
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const [content, setContent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const {
+    content,
+    isLoading: loading,
+    error,
+    fetchContent,
+    moveContentItem: moveItemStore,
+    removeContentItem: removeItemStore,
+  } = useContentStore();
+
   const [activeCategory, setActiveCategory] = useState("movies");
   const [activeStatus, setActiveStatus] = useState("planned");
 
-  const fetchContent = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch("/api/content/get");
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      setContent(data);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Initial fetch
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
   const moveContentItem = async (itemId, newStatus) => {
     try {
-      const itemToMove = content[activeCategory][activeStatus].find(
-        (item) => item.id === itemId
-      );
-      if (!itemToMove) throw new Error("Item not found");
-
-      setContent((prev) => {
-        const newContent = JSON.parse(JSON.stringify(prev));
-        newContent[activeCategory][activeStatus] = newContent[activeCategory][
-          activeStatus
-        ].filter((item) => item.id !== itemId);
-        newContent[activeCategory][newStatus].push(itemToMove);
-        return newContent;
-      });
-
-      const res = await fetch("/api/content/move", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: activeCategory,
-          fromList: activeStatus,
-          toList: newStatus,
-          itemId,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to move item");
+      await moveItemStore(itemId, activeCategory, activeStatus, newStatus);
     } catch (err) {
-      console.error("Move error:", err);
-      setError(err.message);
-      fetchContent();
+      // Error handled in store, but we can add local error handling if needed
+      console.error("Move error in dashboard:", err);
     }
   };
 
   const removeContentItem = async (itemId) => {
     console.log("Removing item:", itemId);
     try {
-      setContent((prev) => {
-        const newContent = { ...prev };
-        newContent[activeCategory][activeStatus] = newContent[activeCategory][
-          activeStatus
-        ].filter((item) => item.id !== itemId);
-        return newContent;
-      });
-
-      const res = await fetch("/api/content/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: activeCategory,
-          list: activeStatus,
-          itemId,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to remove item");
+      await removeItemStore(itemId, activeCategory, activeStatus);
     } catch (err) {
-      console.error("Remove error:", err);
-      setError(err.message);
-      fetchContent();
+      console.error("Remove error in dashboard:", err);
     }
   };
-
-  useEffect(() => {
-    fetchContent();
-  }, []);
 
   const calculateCategoryStats = () => {
     if (!content) return {};
@@ -412,7 +568,12 @@ export default function DashboardPage() {
   const activeCategoryData = contentCategories.find(
     (c) => c.id === activeCategory
   );
+
+  // Dynamic status labels
+  const statusLabels = getStatusLabels(activeCategory);
+
   const activeStatusData = statusOptions.find((s) => s.id === activeStatus);
+  const activeStatusLabel = statusLabels[activeStatus];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -425,7 +586,16 @@ export default function DashboardPage() {
           <p className="text-gray-400">Manage your watchlist and collections</p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
+          <Link href="/community">
+            <Button
+              variant="outline"
+              className="gap-2 bg-rose-600/10 hover:bg-rose-600/20 hover:text-rose-600/50 border-rose-400 text-rose-400"
+            >
+              <Users className="h-5 w-5" />
+              Community
+            </Button>
+          </Link>
           <Link href="/card">
             <Button
               variant="outline"
@@ -594,10 +764,13 @@ export default function DashboardPage() {
             </TabsList>
           </Tabs>
         </div>
-{/* AI Recommendations Section */}
-      {content && content[activeCategory]?.completed?.length > 0 && (
-        <AIRecommendations content={content} activeCategory={activeCategory} />
-      )}
+        {/* AI Recommendations Section */}
+        {content && content[activeCategory]?.completed?.length > 0 && (
+          <AIRecommendations
+            content={content}
+            activeCategory={activeCategory}
+          />
+        )}
         {/* Status Filters - Full Width Grid */}
         <div className="flex flex-wrap gap-2 mt-6">
           {statusOptions.map((status) => {
@@ -614,7 +787,7 @@ export default function DashboardPage() {
                   isActive ? textColorClass : "text-gray-400"
                 }`}
               >
-                {status.name}
+                {statusLabels[status.id]}
                 <span className="absolute bottom-0 left-0 right-0 h-0.5">
                   {isActive && (
                     <motion.span
@@ -644,7 +817,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-2">
                 <CardTitle className="text-white">
-                  {activeCategoryData?.name} - {activeStatusData?.name}
+                  {activeCategoryData?.name} - {activeStatusLabel}
                 </CardTitle>
                 <Link href={`/${activeCategory}`}>
                   <Button
@@ -673,19 +846,22 @@ export default function DashboardPage() {
                   variant="outline"
                   className="border-blue-700 text-blue-700"
                 >
-                  {categoryStats[activeCategory]?.planned || 0} Planned
+                  {categoryStats[activeCategory]?.planned || 0}{" "}
+                  {statusLabels.planned}
                 </Badge>
                 <Badge
                   variant="outline"
                   className="border-rose-700 text-rose-700"
                 >
-                  {categoryStats[activeCategory]?.inProgress || 0} Watching
+                  {categoryStats[activeCategory]?.inProgress || 0}{" "}
+                  {statusLabels.inProgress}
                 </Badge>
                 <Badge
                   variant="outline"
                   className="border-green-700 text-green-700"
                 >
-                  {categoryStats[activeCategory]?.completed || 0} Watched
+                  {categoryStats[activeCategory]?.completed || 0}{" "}
+                  {statusLabels.completed}
                 </Badge>
               </div>
             </div>
@@ -745,7 +921,7 @@ export default function DashboardPage() {
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      Move to {status.name}
+                                      Move to {statusLabels[status.id]}
                                     </TooltipContent>
                                   </Tooltip>
                                 ))}
@@ -804,8 +980,6 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
-
-      
     </div>
   );
 }

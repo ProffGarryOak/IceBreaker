@@ -652,7 +652,7 @@ export default function Landing() {
       {/* 🔥 Trending Now Section */}
       <section
         className="py-16 bg-gradient-to-r from-purple-900/50 to-blue-900/50 backdrop-blur-sm"
-        id="explore"
+        id="explore-community"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
@@ -661,6 +661,18 @@ export default function Landing() {
               <p className="text-gray-400">
                 The community is obsessed with these right now
               </p>
+            </div>
+            <div className="flex gap-4">
+              <SignedOut>
+                <SignInButton>
+                  <Button>Join the Community</Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/community">
+                  <Button>Go to Community</Button>
+                </Link>
+              </SignedIn>
             </div>
           </div>
 

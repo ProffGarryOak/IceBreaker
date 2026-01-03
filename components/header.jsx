@@ -26,6 +26,7 @@ import {
   ListCollapse,
   Menu,
   X,
+  Users,
 } from "lucide-react";
 import {
   ClerkProvider,
@@ -110,10 +111,10 @@ export function Header() {
             href="/"
             className="flex items-center gap-0 font-semibold text-blue-300"
           >
-            <Image 
-              src="/logo.png" 
+            <Image
+              src="/logo.png"
               alt="Ice Breaker Logo"
-              width={28} 
+              width={28}
               height={28}
               className="h-15 w-15"
             />
@@ -178,8 +179,9 @@ export function Header() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white hover:bg-white/10 hover:text-white/80 transition-colors"
               >
                 <Link href="#content" className="flex items-center gap-1.5">
-                <ListCollapse className="h-4 w-4 shrink-0" />
-                <span className="whitespace-nowrap">Content</span></Link>
+                  <ListCollapse className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">Content</span>
+                </Link>
               </Button>
             </SignedOut>
 
@@ -194,13 +196,22 @@ export function Header() {
             </SignedIn>
             <SignedOut>
               <Link
-                href="#explore"
+                href="/#explore-community"
                 className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors px-2 py-1 rounded-md hover:bg-white/10"
               >
                 <Compass className="h-[1.1rem] w-[1.1rem]" />
-                <span>Explore</span>
+                <span>Community</span>
               </Link>
             </SignedOut>
+            <SignedIn>
+              <Link
+                href="/community"
+                className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors px-2 py-1 rounded-md hover:bg-white/10"
+              >
+                <Users className="h-[1.1rem] w-[1.1rem]" />
+                <span>Community</span>
+              </Link>
+            </SignedIn>
           </nav>
         </div>
 
@@ -253,19 +264,25 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           ref={mobileMenuRef}
           className="md:hidden bg-black border-t border-gray-800 fixed inset-x-0 top-16"
         >
           <div className="container px-4 py-4 space-y-4">
             <SignedIn>
-              <Link href="/card" className="flex items-center gap-2 text-white hover:text-white/80">
+              <Link
+                href="/card"
+                className="flex items-center gap-2 text-white hover:text-white/80"
+              >
                 <Snowflake className="h-4 w-4" />
                 IceCard
               </Link>
             </SignedIn>
             <SignedOut>
-              <Link href="#card" className="flex items-center gap-2 text-white hover:text-white/80">
+              <Link
+                href="#card"
+                className="flex items-center gap-2 text-white hover:text-white/80"
+              >
                 <Snowflake className="h-4 w-4" />
                 IceCard
               </Link>
@@ -295,13 +312,22 @@ export function Header() {
             </SignedIn>
             <SignedOut>
               <Link
-                href="#explore"
+                href="/#explore-community"
                 className="flex items-center gap-2 text-white hover:text-white/80"
               >
                 <Compass className="h-4 w-4" />
-                Explore
+                Community
               </Link>
             </SignedOut>
+            <SignedIn>
+              <Link
+                href="/community"
+                className="flex items-center gap-2 text-white hover:text-white/80"
+              >
+                <Users className="h-4 w-4" />
+                Community
+              </Link>
+            </SignedIn>
 
             <div className="pt-4 border-t border-gray-800">
               <SignedOut>
